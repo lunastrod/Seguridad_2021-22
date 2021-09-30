@@ -15,8 +15,7 @@ if(len(sys.argv)!=2):
     exit(-1)
 
 key=int(sys.argv[1])
-print("key: ",key)
 
 for line in sys.stdin:
-    sys.stdout.write(line)
+    #sys.stdout.write(line)
     print(caesar_encrypt(line, key))
