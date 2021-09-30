@@ -78,13 +78,19 @@ def caesar_decrypt(text):
         attempt=(i,text_attempt,calculate_relative_freq(text_attempt),calculate_bigrams_freq(text_attempt),calculate_trigrams_freq(text_attempt))
         result.append(attempt)
 
-    result.sort(key=lambda x:-x[4])
-    print(result[0][0])
-    result.sort(key=lambda x:-x[3])
-    print(result[0][0])
-    result.sort(key=lambda x:x[2])
-    print(result[0][0])
-    return result
+
+    solutions={}
+    result.sort(key=lambda x:x[2])#frequencies
+    solutions[result[0][0]]=result[0]
+    result.sort(key=lambda x:-x[3])#bigrams
+    solutions[result[0][0]]=result[0]
+    result.sort(key=lambda x:-x[4])#trigrams
+    solutions[result[0][0]]=result[0]
+
+    print(solutions)
+
+
+    return solutions
 
 
 
