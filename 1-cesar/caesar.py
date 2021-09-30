@@ -1,13 +1,13 @@
 import sys
 
-def caesar_encript(text, key):
+def caesar_encrypt(text, key):
     text=text.upper()
     result=""
     for c in text:
         if(c.isupper()):
-            c=chr((ord(c)+key-ord("A"))%25+ord("A"))
+            c=chr((ord(c)+key-ord("A"))%26+ord("A"))
         result+=c
-    print(result)
+    return result
 
 
 if(len(sys.argv)!=2):
@@ -19,5 +19,4 @@ print("key: ",key)
 
 for line in sys.stdin:
     sys.stdout.write(line)
-    caesar_encript(line, key)
-    
+    print(caesar_encrypt(line, key))
