@@ -19,4 +19,4 @@ key=int(sys.argv[1])
 
 for line in sys.stdin:
     #sys.stdout.write(line)
-    print(caesar_encrypt(line, key))
+    print(caesar_encrypt(line, key),end="")

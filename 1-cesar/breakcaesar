@@ -33,6 +33,8 @@ char_frequency = {
 bigrams=['TH', 'HE', 'IN', 'EN', 'NT', 'RE', 'ER', 'AN', 'TI', 'ES', 'ON', 'AT', 'SE', 'ND', 'OR', 'AR', 'AL', 'TE', 'CO', 'DE', 'TO', 'RA', 'ET', 'ED', 'IT', 'SA', 'EM', 'RO']
 trigrams=['THE', 'AND', 'THA', 'ENT', 'ING', 'ION', 'TIO', 'FOR', 'NDE', 'HAS', 'NCE', 'EDT', 'TIS', 'OFT', 'STH', 'MEN']
 
+DEBUG=False
+
 def caesar_encrypt(text, key):
     text=text.upper()
     encrypted=""
@@ -72,13 +74,16 @@ def calculate_relative_freq(text):
     return result
 
 def caesar_decrypt(text):
+    #guardo el texto repetido 26 veces, pero da igual incluso para textos largos (6.5MB)
     result=[]
     for i in range(26):
+        if(DEBUG):
+            print("decrypting...",i)
         text_attempt=caesar_encrypt(text,-i)
         attempt=(i,text_attempt,calculate_relative_freq(text_attempt),calculate_bigrams_freq(text_attempt),calculate_trigrams_freq(text_attempt))
         result.append(attempt)
 
-
+    #Se que no hace falta hacer un sort, pero es tan rápido que da igual, incluso para textos largos (6.5MB)
     solutions={}
     result.sort(key=lambda x:x[2])#frequencies
     solutions[result[0][0]]=result[0]
@@ -87,24 +92,7 @@ def caesar_decrypt(text):
     result.sort(key=lambda x:-x[4])#trigrams
     solutions[result[0][0]]=result[0]
 
-    print(solutions)
-
-
     return solutions
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 if(len(sys.argv)!=1):
     print("argc error", file=sys.stderr)
@@ -114,7 +102,7 @@ text=""
 for line in sys.stdin:
     text+=line
 
-#sys.stdout.write(text)
 
-text=text.strip()
-caesar_decrypt(text)
+solutions=caesar_decrypt(text)
+for i in solutions:
+    print("key =",i)
