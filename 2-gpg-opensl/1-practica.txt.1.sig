@@ -1,3 +1,6 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
 PRACTICA DE SEGURIDAD EN REDES DE ORDENADORES.
 
 USO DE GPG Y COMANDOS DE OPENSSL
@@ -11,7 +14,7 @@ fichero, en el hueco indicado. Las respuestas deben estar escritas en
 texto plano UTF-8 **CORRECTAMENTE FORMATEADO** , respondiendo a las
 preguntas, resumiendo los pasos que ha tenido que seguir para realizar
 cada apartado de la práctica y especificando los comandos que ha
-ejecutado. SE DEBEN ESPECIFICAR TODOS LOS COMANDOS PARA REALIZAR CADA
+jecutado. SE DEBEN ESPECIFICAR TODOS LOS COMANDOS PARA REALIZAR CADA
 PARTE DE CADA APARTADO DEL ENUNCIADO, COPIANDO EL TEXTO DEL TERMINAL
 (TANTO COMANDO COMO SALIDA, SIEMPRE QUE NO SEA MUY LARGA LA SALIDA).
 
@@ -25,50 +28,9 @@ bits (tanto firma como cifrado) y que caduque en 5 años.
 COMANDO:
 ====================================================
 
-gpg --full-gen-key
-gpg (GnuPG) 2.2.19; Copyright (C) 2019 Free Software Foundation, Inc.
-This is free software: you are free to change and redistribute it.
-There is NO WARRANTY, to the extent permitted by law.
 
-Please select what kind of key you want:
-   (1) RSA and RSA (default)
-   (2) DSA and Elgamal
-   (3) DSA (sign only)
-   (4) RSA (sign only)
-  (14) Existing key from card
-Your selection? 1
-RSA keys may be between 1024 and 4096 bits long.
-What keysize do you want? (3072) 4096
-Requested keysize is 4096 bits
-Please specify how long the key should be valid.
-         0 = key does not expire
-      <n>  = key expires in n days
-      <n>w = key expires in n weeks
-      <n>m = key expires in n months
-      <n>y = key expires in n years
-Key is valid for? (0) 5y
-Key expires at Mon Oct 12 11:44:48 2026 CEST
-Is this correct? (y/N) y
 
-GnuPG needs to construct a user ID to identify your key.
 
-Real name: dparras
-Email address: d.parras.2018@alumnos.urjc.es
-Comment: ejercicio 2 seguridad
-You selected this USER-ID:
-    "dparras (ejercicio 2 seguridad) <d.parras.2018@alumnos.urjc.es>"
-
-Change (N)ame, (C)omment, (E)mail or (O)kay/(Q)uit? o
-
-gpg: key BDA9A882054E4A4F marked as ultimately trusted
-gpg: directory '/home/alumnos/dparras/.gnupg/openpgp-revocs.d' created
-gpg: revocation certificate stored as '/home/alumnos/dparras/.gnupg/openpgp-revocs.d/FF5688D72CDC67DA5FDEDAA2BDA9A882054E4A4F.rev'
-public and secret key created and signed.
-
-pub   rsa4096 2021-10-13 [SC] [expires: 2026-10-12]
-      FF5688D72CDC67DA5FDEDAA2BDA9A882054E4A4F
-uid                      dparras (ejercicio 2 seguridad) <d.parras.2018@alumnos.urjc.es>
-sub   rsa4096 2021-10-13 [E] [expires: 2026-10-12]
 
 
 ====================================================
@@ -88,21 +50,8 @@ GPG) la clave pública de Enrique Soriano es la misma.
 COMANDOS:
 ====================================================
 
-//busco la clave de esoriano en el keyserver
-gpg --keyserver keyserver.ubuntu.com --search-keys esoriano
-gpg: data source: https://162.213.33.8:443
-(1)     Enrique Soriano-Salvador <enrique.soriano@urjc.es>
-        Enrique Soriano-Salvador <enrique.soriano@gmail.com>
-        Enrique Soriano-Salvador <esoriano@gsyc.urjc.es>
-          4096 bit RSA key 26930ACAF90A5363, created: 2012-11-14
-(2)       4096 bit RSA key 7ECF9AFD29D227AF, created: 2012-01-18
-Keys 1-2 of 2 for "esoriano".  Enter number(s), N)ext, or Q)uit > n
 
-//pido la clave al servidor
-gpg --keyserver keyserver.ubuntu.com --recv-key 26930ACAF90A5363
 
-//exporto la clave a un fichero
-gpg --output esoriano.asc --armor --export enrique.soriano@urjc.es
 
 
 
@@ -114,7 +63,7 @@ son auténticas y pertenecen a Enrique Soriano? ¿Por qué?
 RESPUESTA:
 ====================================================
 
-No, necesito comprobar el fingerprint de la clave por un canal seguro
+
 
 
 
@@ -127,18 +76,12 @@ canal seguro:
 
 COMANDOS:
 ====================================================
-gpg --fingerprint esoriano
-
-pub   rsa4096 2012-11-14 [SCEA] [expires: 2026-02-21]
-      29C5 32C0 EE85 7DCE 384E  3627 2693 0ACA F90A 5363
-uid           [ unknown] Enrique Soriano-Salvador <enrique.soriano@urjc.es>
-uid           [ unknown] Enrique Soriano-Salvador <esoriano@gsyc.urjc.es>
-uid           [ unknown] Enrique Soriano-Salvador <enrique.soriano@gmail.com>
-sub   rsa4096 2012-11-14 [SEA] [expires: 2026-02-21]
 
 
-//29C5 32C0 EE85 7DCE 384E  3627 2693 0ACA F90A 5363
-//coincide con el fingerprint entregado en persona
+
+
+
+
 ====================================================
 
 4. ¿Ahora puede estar seguro de que la clave descargada es auténtica
@@ -147,7 +90,7 @@ y pertenece al profesor?
 RESPUESTA:
 ====================================================
 
-Sí, he comprobado el fingerprint
+
 
 
 
@@ -160,13 +103,10 @@ de claves que ha usado antes.
 COMANDOS:
 ====================================================
 
-//firmo la clave
 
-gpg --sign esoriano.asc
 
-//la mando al servidor
 
-gpg --keyserver keyserver.ubuntu.com  --send-keys 26930ACAF90A5363
+
 
 ====================================================
 
@@ -177,20 +117,6 @@ pública de forma segura:
 COMANDO y RESPUESTA:
 ====================================================
 
-//miro fingerprint de mi clave
-
-gpg --list-keys
-/home/alumnos/dparras/.gnupg/pubring.kbx
-----------------------------------------
-pub   rsa4096 2021-10-13 [SC] [expires: 2026-10-12]
-      FF5688D72CDC67DA5FDEDAA2BDA9A882054E4A4F
-uid           [ultimate] dparras (ejercicio 2 seguridad) <d.parras.2018@alumnos.urjc.es>
-sub   rsa4096 2021-10-13 [E] [expires: 2026-10-12]
-
-
-//subo mi clave al servidor
-
-gpg --keyserver keyserver.ubuntu.com --send-keys FF5688D72CDC67DA5FDEDAA2BDA9A882054E4A4F
 
 
 
@@ -220,28 +146,10 @@ alguna de las versiones fue publicada por el profesor? ¿Cuál o cuáles?
 COMANDO y RESPUESTA:
 ====================================================
 
-gpg --output 1-practica.txt.1 --decrypt 1-practica.txt.1.sig
-gpg: Signature made Mon Feb 22 18:26:55 2021 CET
-gpg:                using RSA key C7DC3D54399FC39D290A61C9A8D6D9F50054BBA6
-gpg: BAD signature from "Enrique Soriano-Salvador <enrique.soriano@urjc.es>" [unknown]
 
-gpg --output 1-practica.txt.2 --decrypt 1-practica.txt.2.sig
-gpg: Signature made Mon Feb 22 18:26:55 2021 CET
-gpg:                using RSA key C7DC3D54399FC39D290A61C9A8D6D9F50054BBA6
-gpg: BAD signature from "Enrique Soriano-Salvador <enrique.soriano@urjc.es>" [unknown]
 
-gpg --output 1-practica.txt.3 --decrypt 1-practica.txt.3.sig
-gpg: Signature made Mon Feb 22 18:26:55 2021 CET
-gpg:                using RSA key C7DC3D54399FC39D290A61C9A8D6D9F50054BBA6
-gpg: Good signature from "Enrique Soriano-Salvador <enrique.soriano@urjc.es>" [unknown]
-gpg:                 aka "Enrique Soriano-Salvador <esoriano@gsyc.urjc.es>" [unknown]
-gpg:                 aka "Enrique Soriano-Salvador <enrique.soriano@gmail.com>" [unknown]
-gpg: WARNING: This key is not certified with a trusted signature!
-gpg:          There is no indication that the signature belongs to the owner.
-Primary key fingerprint: 29C5 32C0 EE85 7DCE 384E  3627 2693 0ACA F90A 5363
-     Subkey fingerprint: C7DC 3D54 399F C39D 290A  61C9 A8D6 D9F5 0054 BBA6
 
-//el tercer fichero está firmado por esoriano
+
 
 ====================================================
 
@@ -253,9 +161,10 @@ estaba cifrado? ¿En qué modo? ¿Qué dice el mensaje?
 COMANDOS Y RESPUESTA:
 ====================================================
 
-//seceto: _-_practica-gpg_-_
 
-openssl aes-256-cbc -d -in p1secret.gpg -out p1secret.txt
+
+
+
 
 ====================================================
 
@@ -420,3 +329,19 @@ RESPUESTA:
 
 
 ====================================================
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEx9w9VDmfw50pCmHJqNbZ9QBUu6YFAmAz6V8ACgkQqNbZ9QBU
+u6Y/3Q/+JyITFSE8qySsyscHsgddlF7+GGpCI6kZ/e4bnkMgEdcMJQz8EK0K0ya0
+N0oMEoLlmUmRkRWWsg73Lay/QlzCX/3A2Ru6WrrJ2reiDpu0O/IdTFX3drTypQYi
+/JcKm4vgtjMms1ypDhF9Ys+oEzFT5xp/xOziMgtMvouNR2DFNuJp+Om6etRK7KF1
+cRc/m8u4bIYH/RJQxDqhKE4qg7GNTeblHJoNYg0Qi+Dw32i8UN3TfC4+BwwQ/zvJ
+4Eh6fnJtVs9NFvOS7tq0h+4Nz+1uM+RzZPFxx12gBLBIa/jpyW/F/zO+ByJw9OeH
+G477BRnCF6QclF8EaDx3Cp8Kc9clQcm8bm0xxjgTJmAIFsITAI31RB5oG1HOLKT7
+gYjMqAU+QZSq1QNxuS9G/k9Qes/MnMOLhoLDO0k8Uzgxi1OhDzlBICSX2J0jf4Xe
+tICgbyoo0ZKxfvCXo4BUhKsZFZhbGVssotoyyySK4Kql/3Tpu8QGmhgXwctwaQIb
+fG4u25Er3AWttudECA/dkzPVuWPyU9M1eyuAZGm+E4e46w5rQTI+RRUq2jRg3bKv
+dgLCbc79mobmLgfq61rRZdCUaUHMP0qvt/rEdRCQN71Xc4+zdIq56TtV0Jo25Q0L
+JHGf/Fm6zLbpdt8jBGYFwBMShiS74OyXQshrjBy+u4pXNHs9dLk=
+=/R96
+-----END PGP SIGNATURE-----
