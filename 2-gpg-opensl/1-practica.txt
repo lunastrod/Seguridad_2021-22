@@ -255,7 +255,10 @@ COMANDOS Y RESPUESTA:
 
 //seceto: _-_practica-gpg_-_
 
-openssl aes-256-cbc -d -in p1secret.gpg -out p1secret.txt
+//desencripta???
+echo "_-_practica-gpg_-_" | gpg --batch --passphrase-fd 0 --output p1secret_decrypted --decrypt p1secret.gpg
+
+
 
 ====================================================
 
@@ -267,9 +270,18 @@ mensaje?
 COMANDOS Y RESPUESTA:
 ====================================================
 
+//El mensaje es íntegro y no puede repudiarse
 
-
-
+gpg --verify p1secret.sig p1secret_decrypted
+gpg: Signature made Mon Feb 22 18:38:00 2021 CET
+gpg:                using RSA key C7DC3D54399FC39D290A61C9A8D6D9F50054BBA6
+gpg: Good signature from "Enrique Soriano-Salvador <enrique.soriano@urjc.es>" [unknown]
+gpg:                 aka "Enrique Soriano-Salvador <esoriano@gsyc.urjc.es>" [unknown]
+gpg:                 aka "Enrique Soriano-Salvador <enrique.soriano@gmail.com>" [unknown]
+gpg: WARNING: This key is not certified with a trusted signature!
+gpg:          There is no indication that the signature belongs to the owner.
+Primary key fingerprint: 29C5 32C0 EE85 7DCE 384E  3627 2693 0ACA F90A 5363
+     Subkey fingerprint: C7DC 3D54 399F C39D 290A  61C9 A8D6 D9F5 0054 BBA6
 
 
 ====================================================
@@ -281,10 +293,11 @@ usada para descifrar.
 COMANDOS Y RESPUESTA:
 ====================================================
 
+//sí, el mensaje oculto es: Hack the world
 
-
-
-
+steghide extract -sf p1secret_decrypted 
+Enter passphrase: 
+wrote extracted data to "stegomensaje.txt".
 
 ====================================================
 
