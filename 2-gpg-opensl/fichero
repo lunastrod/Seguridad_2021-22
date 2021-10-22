@@ -483,7 +483,9 @@ RESPUESTA:
 
 gpg -o 1-practica.gpg --sign --encrypt -r enrique.soriano@urjc.es 1-practica.txt
 
+//para exportar mi clave publica
 
+gpg --output clave.gpg --armor --export d.parras.2018@alumnos.urjc.es
 
 
 ====================================================
