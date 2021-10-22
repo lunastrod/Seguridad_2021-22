@@ -1,0 +1,489 @@
+PRACTICA DE SEGURIDAD EN REDES DE ORDENADORES.
+
+USO DE GPG Y COMANDOS DE OPENSSL
+
+Esta práctica consiste en aprender a utilizar GPG y los comandos de
+OpenSSL para cifrar y descifrar ficheros, y gestionar las claves
+públicas del resto de usuarios.
+
+ENTREGA: el usuario debe responder a las preguntas en este mismo
+fichero, en el hueco indicado. Las respuestas deben estar escritas en
+texto plano UTF-8 **CORRECTAMENTE FORMATEADO** , respondiendo a las
+preguntas, resumiendo los pasos que ha tenido que seguir para realizar
+cada apartado de la práctica y especificando los comandos que ha
+ejecutado. SE DEBEN ESPECIFICAR TODOS LOS COMANDOS PARA REALIZAR CADA
+PARTE DE CADA APARTADO DEL ENUNCIADO, COPIANDO EL TEXTO DEL TERMINAL
+(TANTO COMANDO COMO SALIDA, SIEMPRE QUE NO SEA MUY LARGA LA SALIDA).
+
+Entregue la memoria como indica el último apartado del enunciado.
+
+
+1. Cree su par de claves GPG, eligiendo como algoritmo RSA de 4096
+bits (tanto firma como cifrado) y que caduque en 5 años.
+ Elija una passphrase segura.
+
+COMANDO:
+====================================================
+
+gpg --full-gen-key
+gpg (GnuPG) 2.2.19; Copyright (C) 2019 Free Software Foundation, Inc.
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Please select what kind of key you want:
+   (1) RSA and RSA (default)
+   (2) DSA and Elgamal
+   (3) DSA (sign only)
+   (4) RSA (sign only)
+  (14) Existing key from card
+Your selection? 1
+RSA keys may be between 1024 and 4096 bits long.
+What keysize do you want? (3072) 4096
+Requested keysize is 4096 bits
+Please specify how long the key should be valid.
+         0 = key does not expire
+      <n>  = key expires in n days
+      <n>w = key expires in n weeks
+      <n>m = key expires in n months
+      <n>y = key expires in n years
+Key is valid for? (0) 5y
+Key expires at Mon Oct 12 11:44:48 2026 CEST
+Is this correct? (y/N) y
+
+GnuPG needs to construct a user ID to identify your key.
+
+Real name: dparras
+Email address: d.parras.2018@alumnos.urjc.es
+Comment: ejercicio 2 seguridad
+You selected this USER-ID:
+    "dparras (ejercicio 2 seguridad) <d.parras.2018@alumnos.urjc.es>"
+
+Change (N)ame, (C)omment, (E)mail or (O)kay/(Q)uit? o
+
+gpg: key BDA9A882054E4A4F marked as ultimately trusted
+gpg: directory '/home/alumnos/dparras/.gnupg/openpgp-revocs.d' created
+gpg: revocation certificate stored as '/home/alumnos/dparras/.gnupg/openpgp-revocs.d/FF5688D72CDC67DA5FDEDAA2BDA9A882054E4A4F.rev'
+public and secret key created and signed.
+
+pub   rsa4096 2021-10-13 [SC] [expires: 2026-10-12]
+      FF5688D72CDC67DA5FDEDAA2BDA9A882054E4A4F
+uid                      dparras (ejercicio 2 seguridad) <d.parras.2018@alumnos.urjc.es>
+sub   rsa4096 2021-10-13 [E] [expires: 2026-10-12]
+
+
+====================================================
+
+2. Descargue la clave pública del profesor y guárdela en
+su anillo de claves. Puede descargar la clave del profesor Enrique Soriano
+de:
+
+	http://gsyc.urjc.es/~esoriano
+
+También se puede conseguir de los servidor de claves GPG, como
+https://keyserver.ubuntu.com (puedes buscar otros servidores en google).
+
+Compruebe que en ambos sitios (la página personal y un servidor de claves
+GPG) la clave pública de Enrique Soriano es la misma.
+
+COMANDOS:
+====================================================
+
+//busco la clave de esoriano en el keyserver
+gpg --keyserver keyserver.ubuntu.com --search-keys esoriano
+gpg: data source: https://162.213.33.8:443
+(1)     Enrique Soriano-Salvador <enrique.soriano@urjc.es>
+        Enrique Soriano-Salvador <enrique.soriano@gmail.com>
+        Enrique Soriano-Salvador <esoriano@gsyc.urjc.es>
+          4096 bit RSA key 26930ACAF90A5363, created: 2012-11-14
+(2)       4096 bit RSA key 7ECF9AFD29D227AF, created: 2012-01-18
+Keys 1-2 of 2 for "esoriano".  Enter number(s), N)ext, or Q)uit > n
+
+//pido la clave al servidor
+gpg --keyserver keyserver.ubuntu.com --recv-key 26930ACAF90A5363
+
+//exporto la clave a un fichero
+gpg --output esoriano.asc --armor --export enrique.soriano@urjc.es
+
+
+
+====================================================
+
+3. Después de descargarlas, ¿puede estar seguro de que esas claves descargadas
+son auténticas y pertenecen a Enrique Soriano? ¿Por qué?
+
+RESPUESTA:
+====================================================
+
+No, necesito comprobar el fingerprint de la clave por un canal seguro
+
+
+
+
+====================================================
+
+4. Compruebe la autenticidad de la clave del profesor Enrique Soriano
+comprobando su  fingerprint con el que ha dado el profesor en persona o por un
+canal seguro:
+
+COMANDOS:
+====================================================
+gpg --fingerprint esoriano
+
+pub   rsa4096 2012-11-14 [SCEA] [expires: 2026-02-21]
+      29C5 32C0 EE85 7DCE 384E  3627 2693 0ACA F90A 5363
+uid           [ unknown] Enrique Soriano-Salvador <enrique.soriano@urjc.es>
+uid           [ unknown] Enrique Soriano-Salvador <esoriano@gsyc.urjc.es>
+uid           [ unknown] Enrique Soriano-Salvador <enrique.soriano@gmail.com>
+sub   rsa4096 2012-11-14 [SEA] [expires: 2026-02-21]
+
+
+//29C5 32C0 EE85 7DCE 384E  3627 2693 0ACA F90A 5363
+//coincide con el fingerprint entregado en persona
+====================================================
+
+4. ¿Ahora puede estar seguro de que la clave descargada es auténtica
+y pertenece al profesor?
+
+RESPUESTA:
+====================================================
+
+Sí, he comprobado el fingerprint
+
+
+
+
+====================================================
+
+5. Si es así, firme la clave del profesor y suba la firma al servidor
+de claves que ha usado antes.
+
+COMANDOS:
+====================================================
+
+//firmo la clave
+
+gpg --sign esoriano.asc
+
+//la mando al servidor
+
+gpg --keyserver keyserver.ubuntu.com  --send-keys 26930ACAF90A5363
+
+====================================================
+
+6. Comparta su clave pública con, al menos, otro compañero de clase.
+¿Cómo exporta su clave pública? Resuma todos los pasos para compartir su clave
+pública de forma segura:
+
+COMANDO y RESPUESTA:
+====================================================
+
+//miro fingerprint de mi clave
+
+gpg --list-keys
+/home/alumnos/dparras/.gnupg/pubring.kbx
+----------------------------------------
+pub   rsa4096 2021-10-13 [SC] [expires: 2026-10-12]
+      FF5688D72CDC67DA5FDEDAA2BDA9A882054E4A4F
+uid           [ultimate] dparras (ejercicio 2 seguridad) <d.parras.2018@alumnos.urjc.es>
+sub   rsa4096 2021-10-13 [E] [expires: 2026-10-12]
+
+
+//subo mi clave al servidor
+
+gpg --keyserver keyserver.ubuntu.com --send-keys FF5688D72CDC67DA5FDEDAA2BDA9A882054E4A4F
+
+
+
+
+
+====================================================
+
+7. Añada la clave de un compañero (al menos) a su anillo de claves.
+Asigne el nivel de confianza que desee.
+
+COMANDOS:
+====================================================
+
+
+
+
+
+
+====================================================
+
+
+8. Compruebe la autenticidad y la integridad de las tres versiones
+del enunciado que están disponibles (1, 2, 3). ¿Puede asegurar que
+alguna de las versiones fue publicada por el profesor? ¿Cuál o cuáles?
+¿Por qué?
+
+COMANDO y RESPUESTA:
+====================================================
+
+gpg --output 1-practica.txt.1 --decrypt 1-practica.txt.1.sig
+gpg: Signature made Mon Feb 22 18:26:55 2021 CET
+gpg:                using RSA key C7DC3D54399FC39D290A61C9A8D6D9F50054BBA6
+gpg: BAD signature from "Enrique Soriano-Salvador <enrique.soriano@urjc.es>" [unknown]
+
+gpg --output 1-practica.txt.2 --decrypt 1-practica.txt.2.sig
+gpg: Signature made Mon Feb 22 18:26:55 2021 CET
+gpg:                using RSA key C7DC3D54399FC39D290A61C9A8D6D9F50054BBA6
+gpg: BAD signature from "Enrique Soriano-Salvador <enrique.soriano@urjc.es>" [unknown]
+
+gpg --output 1-practica.txt.3 --decrypt 1-practica.txt.3.sig
+gpg: Signature made Mon Feb 22 18:26:55 2021 CET
+gpg:                using RSA key C7DC3D54399FC39D290A61C9A8D6D9F50054BBA6
+gpg: Good signature from "Enrique Soriano-Salvador <enrique.soriano@urjc.es>" [unknown]
+gpg:                 aka "Enrique Soriano-Salvador <esoriano@gsyc.urjc.es>" [unknown]
+gpg:                 aka "Enrique Soriano-Salvador <enrique.soriano@gmail.com>" [unknown]
+gpg: WARNING: This key is not certified with a trusted signature!
+gpg:          There is no indication that the signature belongs to the owner.
+Primary key fingerprint: 29C5 32C0 EE85 7DCE 384E  3627 2693 0ACA F90A 5363
+     Subkey fingerprint: C7DC 3D54 399F C39D 290A  61C9 A8D6 D9F5 0054 BBA6
+
+//el tercer fichero está firmado por esoriano
+
+====================================================
+
+9. Descargue del foro de la asignatura el fichero p1secret.gpg,
+cifrado con una clave simétrica y descífrelo. El secreto para
+descifrar el fichero se comunicará en clase. ¿Con qué algoritmo
+estaba cifrado? ¿En qué modo? ¿Qué dice el mensaje?
+
+COMANDOS Y RESPUESTA:
+====================================================
+
+//seceto: _-_practica-gpg_-_
+
+//desencripta
+echo "_-_practica-gpg_-_" | gpg --batch --passphrase-fd 0 --output p1secret_decrypted --decrypt p1secret.gpg
+
+
+
+====================================================
+
+10. Descargue a firma del mensaje en claro, p1secret.sig.
+¿Puede estar seguro de que el mensaje es integro (no ha sido
+modificado por un atacante)? ¿Puede el profesor repudiar dicho
+mensaje?
+
+COMANDOS Y RESPUESTA:
+====================================================
+
+//El mensaje es íntegro y no puede repudiarse
+
+gpg --verify p1secret.sig p1secret_decrypted
+gpg: Signature made Mon Feb 22 18:38:00 2021 CET
+gpg:                using RSA key C7DC3D54399FC39D290A61C9A8D6D9F50054BBA6
+gpg: Good signature from "Enrique Soriano-Salvador <enrique.soriano@urjc.es>" [unknown]
+gpg:                 aka "Enrique Soriano-Salvador <esoriano@gsyc.urjc.es>" [unknown]
+gpg:                 aka "Enrique Soriano-Salvador <enrique.soriano@gmail.com>" [unknown]
+gpg: WARNING: This key is not certified with a trusted signature!
+gpg:          There is no indication that the signature belongs to the owner.
+Primary key fingerprint: 29C5 32C0 EE85 7DCE 384E  3627 2693 0ACA F90A 5363
+     Subkey fingerprint: C7DC 3D54 399F C39D 290A  61C9 A8D6 D9F5 0054 BBA6
+
+
+====================================================
+
+11. ¿Oculta dicha imagen algún mensaje con técnicas de esteganografía
+mediante la herramienta steghide? Pruebe con la misma contraseña
+usada para descifrar.
+
+COMANDOS Y RESPUESTA:
+====================================================
+
+//sí, el mensaje oculto es: Hack the world
+
+steghide extract -sf p1secret_decrypted 
+Enter passphrase: 
+wrote extracted data to "stegomensaje.txt".
+
+====================================================
+
+12. Cifre esa misma imagen con el algoritmo de clave simétrica AES, con
+una clave de 256 bits, usando el comando gpg. Haga lo mismo usando el
+comando openssl. Tiene que usar el modo CBC.
+
+COMANDO:
+====================================================
+
+gpg --output p1secret_reencrypted.gpg --symmetric p1secret_decrypted
+
+//pwd: _-_practica-gpg_-_
+
+openssl aes-256-cbc -in p1secret_decrypted -out p1secret_reencrypted.ssl
+
+====================================================
+
+13. Calcule el resumen hash SHA-1 para los dos cifrados anteriores.
+¿Coinciden? ¿Deberían coincidir? ¿Por qué?
+
+COMANDO Y RESPUESTA:
+====================================================
+gpg --print-md SHA1 p1secret_reencrypted.gpg
+p1secret_reencrypted.gpg: A4F7 E53A DC4F 485B 6DB1  664A 2600 E0F0 7157 897B
+
+gpg --print-md SHA1 p1secret_reencrypted.ssl
+p1secret_reencrypted.ssl: 5F93 21C7 845A F2AF 29C2  F330 3ECC 7957 5F8D 2194
+
+//no coinciden, son ficheros diferentes (encabezado, tamaño)
+====================================================
+
+14. Descifre ambos ficheros y compruebe que los datos descifrados son
+exactamente los mismos que los originales generando una hash o usando
+un comando Unix:
+
+COMANDOS:
+====================================================
+
+echo "_-_practica-gpg_-_" | gpg --batch --passphrase-fd 0 --output p1secret_reencrypted.gpg.jpg --decrypt p1secret_reencrypted.gpg
+
+openssl aes-256-cbc -d -in p1secret_reencrypted.ssl -out p1secret_reencrypted.ssl.jpg
+
+
+====================================================
+
+15. Genere un certificado X.509 en texto plano para la compañía ACME,
+con correo electrónico pepe@acme.jp. La clave RSA tiene que ser de
+4096 bits y el certificado debe ser válido por un año desde su
+creación. Indique su número de serie:
+
+COMANDOS:
+====================================================
+
+openssl req -new -nodes -x509 -newkey 4096 \
+-out cert.pem -keyout privkey.pem -days 365 \
+-subj "/C=DE/ST=NRW/L=Earth/O=Random\
+Company/OU=IT/CN=ACME/\
+emailAddress=pepe@acme.jp."
+
+Generating a RSA private key
+writing new private key to 'privkey.pem'
+
+
+
+
+openssl x509 -in cert.pem -text
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number:
+            61:39:0c:01:32:8b:68:6f:9b:f7:2e:e0:b9:6f:74:1d:78:2c:92:e7
+        Signature Algorithm: sha256WithRSAEncryption
+        Issuer: C = DE, ST = NRW, L = Earth, O = RandomCompany, OU = IT, CN = ACME, emailAddress = pepe@acme.jp.
+        Validity
+            Not Before: Oct 17 16:58:32 2021 GMT
+            Not After : Oct 17 16:58:32 2022 GMT
+        Subject: C = DE, ST = NRW, L = Earth, O = RandomCompany, OU = IT, CN = ACME, emailAddress = pepe@acme.jp.
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                RSA Public-Key: (4096 bit)
+                Modulus:
+//numero de serie: 61:39:0c:01:32:8b:68:6f:9b:f7:2e:e0:b9:6f:74:1d:78:2c:92:e7
+
+====================================================
+
+16. ¿Cómo puede enviar la clave privada del certificado anterior como
+cuerpo de un correo electrónico, en texto plano y aplanado en PEM a un
+compañero (de los del ejercicio 7)? ¿Puede el profesor descifrar dicho
+mensaje si se hace con el correo electrónico enviado? ¿Y si le roba
+sus anillos de claves de su directorio $HOME/.gnugp?
+
+COMANDO Y RESPUESTAS:
+====================================================
+
+
+
+
+
+
+====================================================
+
+17. ¿Cómo tendría que descifrar y verificar su compañero el mensaje
+del punto anterior?
+
+RESPUESTA:
+====================================================
+
+
+
+
+
+
+====================================================
+
+18. ¿Cuál es el número de serie y el fingerprint del certificado
+X509 que usa www.urjc.es? ¿Para qué dominios es válido? ¿Y si el
+navegador no entiende la extensión Subject Alternative Names?
+
+COMANDOS Y RESPUESTAS:
+====================================================
+
+openssl x509 -in www.urjc.es -fingerprint 
+SHA1 Fingerprint=54:8C:24:A0:97:43:B3:03:F1:EA:ED:39:37:FC:B2:41:F9:82:71:AC
+
+//serial number
+26:f7:7d:d7:58:f3:26:4b:92:58:66:ff:b1:80:f9:f7
+
+openssl x509 -in www.urjc.es -text
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number:
+            26:f7:7d:d7:58:f3:26:4b:92:58:66:ff:b1:80:f9:f7
+        Signature Algorithm: sha384WithRSAEncryption
+        Issuer: C = NL, O = GEANT Vereniging, CN = GEANT OV RSA CA 4
+        Validity
+            Not Before: Jul  9 00:00:00 2020 GMT
+            Not After : Jul  9 23:59:59 2022 GMT
+        Subject: C = ES, postalCode = 28933, ST = Madrid, L = Mostoles, street = "Calle Tulip\C3\A1n, s/n", O = Universidad Rey Juan Carlos, OU = Servicio IT, CN = www.urjc.es, unstructuredName = www.urjc.es
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                RSA Public-Key: (2048 bit)
+
+
+====================================================
+
+
+19. Verifique la cadena de confianza del certificado del punto anterior
+con el comando openssl. En un sistema GNU/Linux, los certificados raíz
+del sistema se encuentran en el directorio /etc/ssl/certs.
+
+COMANDOS:
+====================================================
+
+/etc/ssl/certs/T-TeleSec_GlobalRoot_Class_2.pem
+/etc/ssl/certs/T-TeleSec_GlobalRoot_Class_3.pem
+
+'GEANT OV RSA CA 4'
+
+www.urjc.es
+
+//TODO: no funciona (pregunta)
+openssl verify -verbose -CAfile <(cat /etc/ssl/certs/T-TeleSec_GlobalRoot_Class_2.pem 'GEANT OV RSA CA 4') www.urjc.es
+
+
+
+====================================================
+
+
+20. Entregue este fichero con las respuestas, firmado y cifrado
+para que sólo Enrique Soriano pueda leerlo. El fichero se tiene
+que llamar practica.gpg. También debe entregar un fichero con su
+clave pública, llamado clave.gpg.
+
+Especifique los comandos que va a ejecutar para crear el fichero
+practica.gpg:
+
+RESPUESTA:
+====================================================
+
+//para que esoriano pueda leerlo, debo encriptar con su clave publica y él desencriptará con su clave privada
+
+gpg -o 1-practica.gpg --sign --encrypt -r enrique.soriano@urjc.es 1-practica.txt
+
+
+
+
+====================================================
