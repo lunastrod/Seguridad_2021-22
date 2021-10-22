@@ -479,7 +479,9 @@ practica.gpg:
 RESPUESTA:
 ====================================================
 
+//para que esoriano pueda leerlo, debo encriptar con su clave publica y él desencriptará con su clave privada
 
+gpg -o 1-practica.gpg --sign --encrypt -r enrique.soriano@urjc.es 1-practica.txt
 
 
 
