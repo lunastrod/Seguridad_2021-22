@@ -53,5 +53,5 @@ int main(){
 
 		close(fd);
 	}
-	close(sockfd); 
+	close(fd); 
 }
