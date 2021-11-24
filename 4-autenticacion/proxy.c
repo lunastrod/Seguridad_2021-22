@@ -1,43 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <openssl/sha.h>
-#include "string.h"
+#include "proxy.h"
 
-//gcc -Wall hmacsha1.c -lssl -lcrypto
-
-enum{
-    MAX_KEY_SIZE=1024,
-    MAX_DATA_SIZE=1024,
-    BLOCK_SIZE=64,//bytes, 512 bits, B
-    HASH_SIZE=20//bytes, sha1 length
-};
-
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <openssl/sha.h>
-
-void hmacsha1(uint8_t * key_input, int key_size, uint8_t * msg, int msg_size);
-typedef unsigned char byte;
-
-int main() {
-    const int DataLen = 4;
-    int i;
-
-    byte* testdata = (byte *)malloc(DataLen);
-    for (i=0; i<DataLen; i++){
-        testdata[i] = 'a';
-    }
-    hmacsha1(testdata,DataLen,testdata,DataLen);
-    return 0;
-}
-
-void print_hex(uint8_t * data, int len){
-    for (int i=0; i<len; i++)
-	    printf("%02x.",(unsigned char)data[i]);
-    putchar('\n');
-    putchar('\n');
-}
 
 void hmacsha1(uint8_t * key_input, int key_size, uint8_t * msg, int msg_size){
     const uint8_t ipad = 0x36;
