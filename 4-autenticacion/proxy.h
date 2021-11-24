@@ -37,6 +37,11 @@ struct auth_response_msg{//server
     char response[RESPONSE_SIZE];//"SUCCESS" "FAILURE" null terminated
 };
 
+struct account{
+    char login[LOGIN_SIZE];
+    uint8_t key[KEY_SIZE];
+};
+
 int setup_client(char* ip, int port);
 void close_client(int sockfd);
 
@@ -47,8 +52,11 @@ void close_server(int sockfd);
 void send_nonce(int connfd, int64_t nonce);//server
 int64_t recv_nonce(int connfd);//client returns nonce
 
-void send_request(int connfd, int64_t nonce, uint8_t * key, char * login);//client computes HMACSHA1(nonce||T,key) inside
-int recv_request(int connfd, int64_t nonce, uint8_t * key);//server validates the key inside, returns true/false
+void send_request(int connfd, int64_t nonce, struct account acc);//client computes HMACSHA1(nonce||T,key) inside
+int recv_request(int connfd, int64_t nonce, FILE * accounts);//server validates the key inside, returns true/false
+
+void hexstr_to_bytes(char * str, uint8_t * bytes, int str_size);
+struct account search_account_file(FILE * f, char * login);//searches login in file, returns login-hmac
 
 void send_response(int connfd, int response);//server response: true/false
 int recv_response(int connfd);//client returns response: true/false

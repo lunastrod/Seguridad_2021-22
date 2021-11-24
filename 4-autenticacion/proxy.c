@@ -199,24 +199,29 @@ void two_int64s_to_bytearr(uint8_t * bytes, int64_t a, int64_t b){
 }
 
 //client computes HMACSHA1(nonce||T,key) inside
-void send_request(int connfd, int64_t nonce, uint8_t * key, char * login){
+void send_request(int connfd, int64_t nonce, struct account acc){
     struct auth_request_msg msg;
-    strncpy(msg.login, login, LOGIN_SIZE);
+    strncpy(msg.login, acc.login, LOGIN_SIZE);
     msg.t=time(NULL);
     uint8_t hmac_data[sizeof(int64_t)+sizeof(int64_t)];
     two_int64s_to_bytearr(hmac_data,nonce,msg.t);
-    hmacsha1(msg.r, key, KEY_SIZE, hmac_data, sizeof(hmac_data));
+    hmacsha1(msg.r, acc.key, KEY_SIZE, hmac_data, sizeof(hmac_data));
     send(connfd, &msg, sizeof(msg), 0);
 }
 
 //server validates the key inside, returns true/false
-int recv_request(int connfd, int64_t nonce, u_int8_t * key){
+int recv_request(int connfd, int64_t nonce, FILE * accounts){
     struct auth_request_msg msg;
     recv(connfd, &msg, sizeof(msg),0);
     uint8_t hmac_data[sizeof(int64_t)+sizeof(int64_t)];
     two_int64s_to_bytearr(hmac_data,nonce,msg.t);
     uint8_t hmac[HASH_SIZE];
-    hmacsha1(hmac, key, KEY_SIZE, hmac_data, sizeof(hmac_data));
+
+    struct account user=search_account_file(accounts, msg.login);
+    if(user.login[0]=='\0'){
+        fprintf(stderr,"user not found in database");
+    }
+    hmacsha1(hmac, user.key, KEY_SIZE, hmac_data, sizeof(hmac_data));
 
     printf("cmp:\n");
     print_hex(msg.r,HASH_SIZE);
@@ -249,4 +254,40 @@ int recv_response(int connfd){
         return 0;
     }
     return -1;
+}
+
+void hexstr_to_bytes(char * str, uint8_t * bytes, int str_size){
+    char hex_buff[3] = {'0', '0', 0};
+    for(int i=0; i<str_size; i+=2){
+        hex_buff[0]=str[i];
+        hex_buff[1]=str[i+1];
+        bytes[i/2] = strtol(hex_buff, NULL, 16);
+    }
+}
+
+struct account search_account_file(FILE * f, char * login){
+    struct account acc;
+    bzero(acc.login,LOGIN_SIZE);
+    bzero(acc.key,KEY_SIZE);
+    char buff[LOGIN_SIZE+1+KEY_SIZE*2+1+1];//login:hex_key\n\0
+    char * file_login;
+    char * file_key;
+    int found=0;
+    while(!found && fgets(buff,sizeof(buff),f)){
+        file_login=strtok(buff,":");
+        if(strncmp(login, file_login, LOGIN_SIZE)==0){
+            found=1;
+        }
+    }
+    if(!found){
+        return acc;//returns acc struct full of '\0's
+    }
+    file_key=strtok(NULL,"\n");
+
+    printf("login:%s    filelogin:%s    key:%s\n",login,file_login,file_key);
+
+    hexstr_to_bytes(file_key,acc.key,KEY_SIZE*2);
+    strncpy(acc.login,login,LOGIN_SIZE);
+    
+    return acc;
 }

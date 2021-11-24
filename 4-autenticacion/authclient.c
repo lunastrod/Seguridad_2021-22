@@ -16,10 +16,11 @@ int main(){
     int64_t nonce= recv_nonce(sockfd);
     printf("nonce: %ld\n",nonce);
 
-    uint8_t key[KEY_SIZE];
-    bzero(key,KEY_SIZE);
-    char * login="dps";
-    send_request(sockfd,nonce,key,login);
+    struct account a;
+    char * key="3f786850e387550fdab836ed7e6dc881de23001b";
+    hexstr_to_bytes(key,a.key,KEY_SIZE*2);
+    strcpy(a.login,"pepe2");
+    send_request(sockfd,nonce,a);
 
     close_client(sockfd);
 }
