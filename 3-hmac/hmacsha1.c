@@ -6,8 +6,6 @@
 //gcc -Wall hmacsha1.c -lssl -lcrypto
 
 enum{
-    MAX_KEY_SIZE=1024,
-    MAX_DATA_SIZE=1024,
     BLOCK_SIZE=64,//bytes, 512 bits, B
     HASH_SIZE=20//bytes, sha1 length
 };

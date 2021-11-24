@@ -2,10 +2,10 @@
 TARGET1 = authclient
 TARGET2 = authserver
 #todos los objetos de los que dependa el ejecutable
-OBJS1 = authclient.o
-OBJS2 = authserver.o
+OBJS1 = authclient.o proxy.o
+OBJS2 = authserver.o proxy.o
 #flags del compilador
-CFLAGS = -Wall
+CFLAGS = -Wall -lssl -lcrypto
 
 .PHONY: all
 all: $(TARGET1) $(TARGET2)

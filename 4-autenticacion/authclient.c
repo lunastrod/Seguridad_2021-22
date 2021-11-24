@@ -1,40 +1,25 @@
-#include <netinet/in.h>	
-#include <stdio.h>
-#include <err.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-    
+#include "proxy.h"
+/*
+1. C←S : nonce
+2. C calcula r=HMACSHA1(nonce||T,key)
+3. C→S  :  r,T,login
+4. S valida r calculando HMACSHA1(nonce||T,key)
+5. C←S : "SUCCESS" o "FAILURE"
+*/
+
 int main(){    
-    struct sockaddr_in sin;
 	int sockfd;
 	int port=8080;
-    char *serverip = "127.0.0.1"; // string
+    char *serverip = "127.0.0.1";
+    sockfd=setup_client(serverip,port);
 
-	sockfd = socket(AF_INET, SOCK_STREAM, 0);
-	if(sockfd < 0) {
-		err(1, "socket failed");
-	}
-	sin.sin_family = AF_INET;
-	sin.sin_addr.s_addr = inet_addr(serverip);
-	sin.sin_port = htons(port);
- 	if(connect(sockfd, (struct sockaddr *)&sin, sizeof(struct sockaddr)) == -1){
-		err(1, "connect failed");
- 	}
-    
-    printf("conexion ok");
-    char buf[1024]="hola";
-    //fgets(buf,1024,sockfd);
-    
-    while(1){
-        printf("sending...%s",buf);
-        fflush(stdout);
-        send(sockfd, buf, 5,0);
-        sleep(1);
-    }
-    
-        //...  // usa sockfd como si fuese un pipe full-duplex
+    int64_t nonce= recv_nonce(sockfd);
+    printf("nonce: %ld\n",nonce);
 
-    sleep(10);
+    uint8_t key[KEY_SIZE];
+    bzero(key,KEY_SIZE);
+    char * login="dps";
+    send_request(sockfd,nonce,key,login);
 
-    close(sockfd);
+    close_client(sockfd);
 }
