@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <err.h>
 
 //sockets
 #include <arpa/inet.h>
@@ -14,6 +15,14 @@
 
 //time() for timestamps
 #include <time.h>
+
+/*
+MACRO PARA PONER TRAZAS
+usage: TDEB("ip:%s port%d",ip,port);
+asi son mas faciles de quitar para hacer la entrega
+*/
+#define TDEB(...) fprintf(stderr,"DEBUG: "__VA_ARGS__); fprintf(stderr,"\n")
+
 
 enum{
     BLOCK_SIZE=64,//512 bits, B
