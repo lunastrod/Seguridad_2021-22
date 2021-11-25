@@ -1,5 +1,4 @@
 #include "proxy.h"
-
 #include <sys/random.h>
 
 /*
@@ -8,6 +7,13 @@
 3. C→S  :  r,T,login
 4. S valida r calculando HMACSHA1(nonce||T,key)
 5. C←S : "SUCCESS" o "FAILURE"
+*/
+
+/*
+assert:
+	1 or 2 args
+	1st must be a filename, checked when opening for read
+	2nd must be a number, optional arg
 */
 
 
@@ -24,38 +30,61 @@ int64_t generate_nonce(){
 	return r;
 }
 
-int main(){
-	int sockfd, connfd;
-	int port=8080;
-    char *serverip = "127.0.0.1";
+int main(int argc, char **argv){
+	if(argc!=2 && argc!=3){
+		err(1,"argc error");//TODO: usage
+	}
+	char * accounts_filename=argv[1];
 
-    sockfd=setup_server(serverip,port);
+	int port=9999;
+	if(argc==3){
+		port=strtol(argv[2],NULL,10);
+	}
+
+
+
+
+	int sockfd, connfd;
+	
+    sockfd=setup_server(port);
 	while(1){
 		connfd=accept_new_client(sockfd);
-		
+		//C←S : nonce
 		int64_t nonce=generate_nonce();
 		send_nonce(connfd,nonce);
-		FILE*accounts=fopen("accounts.txt","r");//TODO: check if file opens ok
-		int result=recv_request(connfd,nonce,accounts);
+
+		//C calcula r=HMACSHA1(nonce||T,key)
+		//C→S  :  r,T,login
+		//S valida r calculando HMACSHA1(nonce||T,key)
+		FILE*accounts=fopen(accounts_filename,"r");
+		if(accounts==NULL){
+			err(1,"error opening %s", accounts_filename);
+		}
+		char login_name[LOGIN_SIZE];
+		int result=recv_request(connfd,nonce,accounts,login_name);
 		fclose(accounts);
+
+		//C←S : "SUCCESS" o "FAILURE"
 		send_response(connfd,result);
 
+		//read the ip from the connfd (I know accept returns it, but I think it's easier this way)
 		struct sockaddr_in client;
 		socklen_t addrlen=sizeof(client);
 		getsockname(connfd,(struct sockaddr *)&client,&addrlen);
 		char client_ip[16];
 		inet_ntop(AF_INET, &client.sin_addr, client_ip, sizeof(client_ip));
 
+		//print result
 		fflush(stdout);
 		if(result){
-			printf("SUCCESS, %s from %s\n","todo",client_ip);
+			printf("SUCCESS, %s from %s\n",login_name,client_ip);
 		}
 		else{
-			printf("FAILURE, %s from %s\n","todo",client_ip);
+			printf("FAILURE, %s from %s\n",login_name,client_ip);
 		}
 		fflush(stdout);
 	}
-	//server never closes, it's stuck in the while loop.
+	//server never closes, it's stuck in the while loop. I could implement a signal handler but it adds complexity
 	close_server(sockfd);
 	exit(0);
 }

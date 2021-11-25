@@ -88,7 +88,7 @@ void close_client(int sockfd){
 
 //setup server listen
 //returns: int sockfd
-int setup_server(char* ip, int port){
+int setup_server(int port){
     // create socket
     int sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd == -1){
@@ -100,7 +100,7 @@ int setup_server(char* ip, int port){
     // assign ip and port
     struct sockaddr_in servaddr;
     servaddr.sin_family = AF_INET;
-    servaddr.sin_addr.s_addr = inet_addr(ip);
+    servaddr.sin_addr.s_addr = INADDR_ANY;
     servaddr.sin_port = htons(port);
 
     // bind to socket
@@ -169,9 +169,11 @@ void send_request(int connfd, int64_t nonce, struct account acc){
 }
 
 //server validates the key inside, returns true/false
-int recv_request(int connfd, int64_t nonce, FILE * accounts){
+int recv_request(int connfd, int64_t nonce, FILE * accounts, char * login_name){
     struct auth_request_msg msg;
     recv(connfd, &msg, sizeof(msg),0);
+    strncpy(login_name,msg.login,LOGIN_SIZE);
+
     uint8_t hmac_data[sizeof(int64_t)+sizeof(int64_t)];
     two_int64s_to_bytearr(hmac_data,nonce,msg.t);
     uint8_t hmac[HASH_SIZE];

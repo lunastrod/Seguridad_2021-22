@@ -54,7 +54,7 @@ struct account{
 int setup_client(char* ip, int port);
 void close_client(int sockfd);
 
-int setup_server(char* ip, int port);
+int setup_server(int port);
 int accept_new_client(int sockfd);
 void close_server(int sockfd);
 
@@ -62,7 +62,8 @@ void send_nonce(int connfd, int64_t nonce);//server
 int64_t recv_nonce(int connfd);//client returns nonce
 
 void send_request(int connfd, int64_t nonce, struct account acc);//client computes HMACSHA1(nonce||T,key) inside
-int recv_request(int connfd, int64_t nonce, FILE * accounts);//server validates the key inside, returns true/false
+//server validates the key inside, returns true/false, writes the client login in login_name
+int recv_request(int connfd, int64_t nonce, FILE * accounts,char * login_name);
 
 void hexstr_to_bytes(char * str, uint8_t * bytes, int str_size);
 struct account search_account_file(FILE * f, char * login);//searches login in file, returns login-hmac
