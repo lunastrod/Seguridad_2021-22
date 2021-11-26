@@ -1,0 +1,6 @@
+instrucciones para compilar:
+make
+
+instrucciones para ejecutar los programas:
+./authclient
+./authserver
